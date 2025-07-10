@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Earnings Calculator - Professional Revenue Estimator</title>
+    
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .animate-slide-up {
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        .animate-bounce-in {
+            animation: bounceIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .dark-gradient-bg {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        }
+        
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .dark .glass-effect {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+        }
+        
+        .dark .tooltiptext {
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+        
+        .number-input {
+            transition: all 0.3s ease;
+        }
+        
+        .number-input:focus {
+            transform: scale(1.02);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        .earnings-card {
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+        
+        .earnings-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .dark .earnings-card:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div id="app" class="min-h-screen">
+        <!-- Header -->
+        <header class="gradient-bg dark:dark-gradient-bg shadow-lg">
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3 animate-fade-in">
+                        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-md">
+                            <i class="fab fa-youtube text-2xl text-red-500"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-white">YouTube Earnings Calculator</h1>
+                            <p class="text-gray-200 text-sm">Estimate your potential revenue</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Dark Mode Toggle -->
+                    <button id="darkModeToggle" class="bg-white dark:bg-gray-800 p-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
+                        <i class="fas fa-moon dark:hidden text-gray-600"></i>
+                        <i class="fas fa-sun hidden dark:block text-yellow-500"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8">
+            <!-- Calculator Section -->
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Input Section -->
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 animate-slide-up">
+                    <div class="flex items-center mb-6">
+                        <i class="fas fa-calculator text-2xl text-blue-500 mr-3"></i>
+                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Calculate Earnings</h2>
+                    </div>
+                    
+                    <!-- Views Input -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Number of Views
+                            <span class="tooltip">
+                                <i class="fas fa-info-circle text-blue-500 ml-1"></i>
+                                <span class="tooltiptext">Enter the total number of views your video has received</span>
+                            </span>
+                        </label>
+                        <input 
+                            type="number" 
+                            id="viewsInput" 
+                            class="number-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-lg"
+                            placeholder="Enter number of views"
+                            min="0"
+                        >
+                    </div>
+                    
+                    <!-- Country Selection -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <i class="fas fa-globe-americas text-blue-500 mr-2"></i>
+                            Country/Region
+                        </label>
+                        <select id="countrySelect" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+                            <option value="us">🇺🇸 United States ($1.00 - $4.00)</option>
+                            <option value="ca">🇨🇦 Canada ($0.80 - $3.50)</option>
+                            <option value="uk">🇬🇧 United Kingdom ($0.70 - $3.00)</option>
+                            <option value="au">🇦🇺 Australia ($0.60 - $2.80)</option>
+                            <option value="de">🇩🇪 Germany ($0.50 - $2.50)</option>
+                            <option value="fr">🇫🇷 France ($0.45 - $2.20)</option>
+                            <option value="jp">🇯🇵 Japan ($0.40 - $2.00)</option>
+                            <option value="br">🇧🇷 Brazil ($0.30 - $1.50)</option>
+                            <option value="in">🇮🇳 India ($0.25 - $1.00)</option>
+                            <option value="global">🌍 Global Average ($0.25 - $4.00)</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Custom CPM -->
+                    <div class="mb-6">
+                        <div class="flex items-center mb-2">
+                            <input type="checkbox" id="customCPMToggle" class="mr-2">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Use Custom CPM Rate
+                                <span class="tooltip">
+                                    <i class="fas fa-info-circle text-blue-500 ml-1"></i>
+                                    <span class="tooltiptext">CPM = Cost Per Mille (per 1000 views)</span>
+                                </span>
+                            </label>
+                        </div>
+                        <input 
+                            type="number" 
+                            id="customCPMInput" 
+                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white disabled:opacity-50"
+                            placeholder="Enter custom CPM value"
+                            min="0"
+                            step="0.01"
+                            disabled
+                        >
+                    </div>
+                    
+                    <!-- Calculate Button -->
+                    <button 
+                        id="calculateBtn" 
+                        class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                    >
+                        <i class="fas fa-calculator mr-2"></i>
+                        Calculate Earnings
+                    </button>
+                </div>
+                
+                <!-- Results Section -->
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 animate-slide-up">
+                    <div class="flex items-center mb-6">
+                        <i class="fas fa-chart-line text-2xl text-green-500 mr-3"></i>
+                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Estimated Earnings</h2>
+                    </div>
+                    
+                    <div id="resultsContainer" class="space-y-4 hidden">
+                        <!-- Earnings Cards -->
+                        <div class="grid gap-4">
+                            <div class="earnings-card bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900 dark:to-red-800 p-4 rounded-lg border-l-4 border-red-500">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm text-red-600 dark:text-red-300 font-medium">Minimum Earnings</p>
+                                        <p id="minEarnings" class="text-2xl font-bold text-red-700 dark:text-red-200">$0.00</p>
+                                    </div>
+                                    <i class="fas fa-arrow-down text-red-500 text-2xl"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="earnings-card bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-900 dark:to-yellow-800 p-4 rounded-lg border-l-4 border-yellow-500">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm text-yellow-600 dark:text-yellow-300 font-medium">Average Earnings</p>
+                                        <p id="avgEarnings" class="text-2xl font-bold text-yellow-700 dark:text-yellow-200">$0.00</p>
+                                    </div>
+                                    <i class="fas fa-minus text-yellow-500 text-2xl"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="earnings-card bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 p-4 rounded-lg border-l-4 border-green-500">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm text-green-600 dark:text-green-300 font-medium">Maximum Earnings</p>
+                                        <p id="maxEarnings" class="text-2xl font-bold text-green-700 dark:text-green-200">$0.00</p>
+                                    </div>
+                                    <i class="fas fa-arrow-up text-green-500 text-2xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Additional Info -->
+                        <div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
+                            <h3 class="font-semibold text-blue-800 dark:text-blue-200 mb-2">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Calculation Details
+                            </h3>
+                            <div class="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                                <p><strong>Views:</strong> <span id="detailViews">0</span></p>
+                                <p><strong>CPM Range:</strong> <span id="detailCPM">$0.00 - $0.00</span></p>
+                                <p><strong>Revenue Share:</strong> 55% (YouTube keeps 45%)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="noResults" class="text-center py-8">
+                        <i class="fas fa-chart-line text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                        <p class="text-gray-500 dark:text-gray-400">Enter view count to see estimated earnings</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chart Section -->
+            <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 animate-bounce-in">
+                <div class="flex items-center mb-6">
+                    <i class="fas fa-chart-bar text-2xl text-purple-500 mr-3"></i>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Earnings Visualization</h2>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="earningsChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Share Section -->
+            <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 animate-slide-up">
+                <div class="flex items-center mb-6">
+                    <i class="fas fa-share-alt text-2xl text-indigo-500 mr-3"></i>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Share Your Results</h2>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-4">
+                    <button id="shareBtn" class="flex items-center justify-center px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-300">
+                        <i class="fas fa-link mr-2"></i>
+                        Copy Share Link
+                    </button>
+                    
+                    <button id="saveBtn" class="flex items-center justify-center px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-300">
+                        <i class="fas fa-save mr-2"></i>
+                        Save Calculation
+                    </button>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="bg-gray-800 dark:bg-gray-900 text-white py-8 mt-12">
+            <div class="container mx-auto px-4 text-center">
+                <p class="text-gray-400">&copy; 2024 YouTube Earnings Calculator. All rights reserved.</p>
+                <p class="text-sm text-gray-500 mt-2">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Earnings are estimates based on industry averages and may vary significantly.
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // App State
+        const app = {
+            darkMode: localStorage.getItem('darkMode') === 'true',
+            chart: null,
+            
+            // CPM ranges by country
+            cpmRanges: {
+                us: { min: 1.00, max: 4.00 },
+                ca: { min: 0.80, max: 3.50 },
+                uk: { min: 0.70, max: 3.00 },
+                au: { min: 0.60, max: 2.80 },
+                de: { min: 0.50, max: 2.50 },
+                fr: { min: 0.45, max: 2.20 },
+                jp: { min: 0.40, max: 2.00 },
+                br: { min: 0.30, max: 1.50 },
+                in: { min: 0.25, max: 1.00 },
+                global: { min: 0.25, max: 4.00 }
+            }
+        };
+
+        // DOM Elements
+        const elements = {
+            darkModeToggle: document.getElementById('darkModeToggle'),
+            viewsInput: document.getElementById('viewsInput'),
+            countrySelect: document.getElementById('countrySelect'),
+            customCPMToggle: document.getElementById('customCPMToggle'),
+            customCPMInput: document.getElementById('customCPMInput'),
+            calculateBtn: document.getElementById('calculateBtn'),
+            resultsContainer: document.getElementById('resultsContainer'),
+            noResults: document.getElementById('noResults'),
+            minEarnings: document.getElementById('minEarnings'),
+            avgEarnings: document.getElementById('avgEarnings'),
+            maxEarnings: document.getElementById('maxEarnings'),
+            detailViews: document.getElementById('detailViews'),
+            detailCPM: document.getElementById('detailCPM'),
+            shareBtn: document.getElementById('shareBtn'),
+            saveBtn: document.getElementById('saveBtn')
+        };
+
+        // Initialize App
+        function init() {
+            // Set initial dark mode
+            if (app.darkMode) {
+                document.documentElement.classList.add('dark');
+            }
+            
+            // Event listeners
+            elements.darkModeToggle.addEventListener('click', toggleDarkMode);
+            elements.customCPMToggle.addEventListener('change', toggleCustomCPM);
+            elements.calculateBtn.addEventListener('click', calculateEarnings);
+            elements.viewsInput.addEventListener('input', debounce(calculateEarnings, 500));
+            elements.countrySelect.addEventListener('change', calculateEarnings);
+            elements.customCPMInput.addEventListener('input', debounce(calculateEarnings, 500));
+            elements.shareBtn.addEventListener('click', shareResults);
+            elements.saveBtn.addEventListener('click', saveCalculation);
+            
+            // Initialize chart
+            initChart();
+            
+            // Load saved data
+            loadSavedData();
+        }
+
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            app.darkMode = !app.darkMode;
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('darkMode', app.darkMode.toString());
+            
+            // Update chart colors
+            if (app.chart) {
+                updateChartColors();
+            }
+        }
+
+        // Custom CPM Toggle
+        function toggleCustomCPM() {
+            const isCustom = elements.customCPMToggle.checked;
+            elements.customCPMInput.disabled = !isCustom;
+            
+            if (isCustom) {
+                elements.customCPMInput.focus();
+            } else {
+                elements.customCPMInput.value = '';
+            }
+            
+            calculateEarnings();
+        }
+
+        // Calculate Earnings
+        function calculateEarnings() {
+            const views = parseInt(elements.viewsInput.value) || 0;
+            
+            if (views <= 0) {
+                showNoResults();
+                return;
+            }
+            
+            const cpmRange = getCPMRange();
+            const earnings = {
+                min: (views / 1000) * cpmRange.min * 0.55, // 55% revenue share
+                avg: (views / 1000) * ((cpmRange.min + cpmRange.max) / 2) * 0.55,
+                max: (views / 1000) * cpmRange.max * 0.55
+            };
+            
+            displayResults(earnings, views, cpmRange);
+            updateChart(earnings);
+        }
+
+        // Get CPM Range
+        function getCPMRange() {
+            if (elements.customCPMToggle.checked && elements.customCPMInput.value) {
+                const customCPM = parseFloat(elements.customCPMInput.value);
+                return { min: customCPM, max: customCPM };
+            }
+            
+            const country = elements.countrySelect.value;
+            return app.cpmRanges[country];
+        }
+
+        // Display Results
+        function displayResults(earnings, views, cpmRange) {
+            elements.resultsContainer.classList.remove('hidden');
+            elements.noResults.classList.add('hidden');
+            
+            // Animate numbers
+            animateValue(elements.minEarnings, 0, earnings.min, 800);
+            animateValue(elements.avgEarnings, 0, earnings.avg, 800);
+            animateValue(elements.maxEarnings, 0, earnings.max, 800);
+            
+            // Update details
+            elements.detailViews.textContent = views.toLocaleString();
+            elements.detailCPM.textContent = `$${cpmRange.min.toFixed(2)} - $${cpmRange.max.toFixed(2)}`;
+        }
+
+        // Show No Results
+        function showNoResults() {
+            elements.resultsContainer.classList.add('hidden');
+            elements.noResults.classList.remove('hidden');
+            
+            if (app.chart) {
+                app.chart.data.datasets[0].data = [];
+                app.chart.update();
+            }
+        }
+
+        // Initialize Chart
+        function initChart() {
+            const ctx = document.getElementById('earningsChart').getContext('2d');
+            
+            app.chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Minimum', 'Average', 'Maximum'],
+                    datasets: [{
+                        label: 'Estimated Earnings ($)',
+                        data: [],
+                        backgroundColor: [
+                            'rgba(239, 68, 68, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(34, 197, 94, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(239, 68, 68, 1)',
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(34, 197, 94, 1)'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `$${context.parsed.y.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toFixed(2);
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        }
+
+        // Update Chart
+        function updateChart(earnings) {
+            if (!app.chart) return;
+            
+            app.chart.data.datasets[0].data = [earnings.min, earnings.avg, earnings.max];
+            app.chart.update();
+        }
+
+        // Update Chart Colors (for dark mode)
+        function updateChartColors() {
+            if (!app.chart) return;
+            
+            const textColor = app.darkMode ? '#ffffff' : '#374151';
+            const gridColor = app.darkMode ? '#374151' : '#e5e7eb';
+            
+            app.chart.options.scales.x.ticks.color = textColor;
+            app.chart.options.scales.y.ticks.color = textColor;
+            app.chart.options.scales.x.grid.color = gridColor;
+            app.chart.options.scales.y.grid.color = gridColor;
+            app.chart.update();
+        }
+
+        // Animate Value
+        function animateValue(element, start, end, duration) {
+            const startTime = performance.now();
+            const startValue = start;
+            const endValue = end;
+            
+            function updateValue(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                const currentValue = startValue + (endValue - startValue) * easeOutQuart(progress);
+                element.textContent = '$' + currentValue.toFixed(2);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateValue);
+                }
+            }
+            
+            requestAnimationFrame(updateValue);
+        }
+
+        // Easing function
+        function easeOutQuart(t) {
+            return 1 - Math.pow(1 - t, 4);
+        }
+
+        // Debounce function
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Share Results
+        function shareResults() {
+            const views = elements.viewsInput.value;
+            const country = elements.countrySelect.value;
+            const customCPM = elements.customCPMToggle.checked ? elements.customCPMInput.value : '';
+            
+            const shareData = {
+                views,
+                country,
+                customCPM
+            };
+            
+            const shareUrl = `${window.location.origin}${window.location.pathname}?data=${btoa(JSON.stringify(shareData))}`;
+            
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                showNotification('Share link copied to clipboard!', 'success');
+            }).catch(() => {
+                showNotification('Failed to copy link', 'error');
+            });
+        }
+
+        // Save Calculation
+        function saveCalculation() {
+            const calculation = {
+                views: elements.viewsInput.value,
+                country: elements.countrySelect.value,
+                customCPM: elements.customCPMToggle.checked ? elements.customCPMInput.value : '',
+                timestamp: new Date().toISOString()
+            };
+            
+            const savedCalculations = JSON.parse(localStorage.getItem('savedCalculations') || '[]');
+            savedCalculations.push(calculation);
+            localStorage.setItem('savedCalculations', JSON.stringify(savedCalculations));
+            
+            showNotification('Calculation saved!', 'success');
+        }
+
+        // Load Saved Data
+        function loadSavedData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const data = urlParams.get('data');
+            
+            if (data) {
+                try {
+                    const shareData = JSON.parse(atob(data));
+                    elements.viewsInput.value = shareData.views;
+                    elements.countrySelect.value = shareData.country;
+                    
+                    if (shareData.customCPM) {
+                        elements.customCPMToggle.checked = true;
+                        elements.customCPMInput.disabled = false;
+                        elements.customCPMInput.value = shareData.customCPM;
+                    }
+                    
+                    calculateEarnings();
+                } catch (e) {
+                    console.error('Error loading shared data:', e);
+                }
+            }
+        }
+
+        // Show Notification
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg animate-fade-in ${
+                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
